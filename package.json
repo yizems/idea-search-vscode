@@ -1,0 +1,88 @@
+{
+  "name": "idea-search",
+  "displayName": "IDEA Search",
+  "description": "IntelliJ IDEA-like search experience for VS Code — floating popup, multi-tab sessions, custom scopes",
+  "version": "0.1.0",
+  "engines": {
+    "vscode": "^1.74.0"
+  },
+  "categories": ["Other"],
+  "activationEvents": [],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "idea-search.findInFiles",
+        "title": "Find in Files (IDEA Style)",
+        "category": "IDEA Search"
+      },
+      {
+        "command": "idea-search.searchEverywhere",
+        "title": "Search Everywhere",
+        "category": "IDEA Search"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "idea-search.findInFiles",
+        "key": "ctrl+shift+f",
+        "mac": "cmd+shift+f"
+      },
+      {
+        "command": "idea-search.searchEverywhere",
+        "key": "shift+shift",
+        "mac": "shift+shift"
+      }
+    ],
+    "views": {
+      "panel": [
+        {
+          "type": "webview",
+          "id": "idea-search.panel",
+          "name": "IDEA Search"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "IDEA Search",
+      "properties": {
+        "idea-search.maxTabs": {
+          "type": "number",
+          "default": 10,
+          "minimum": 1,
+          "maximum": 30,
+          "description": "Maximum number of search tabs to keep open in the panel"
+        },
+        "idea-search.showPreviewInSearchEverywhere": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show file preview panel in Search Everywhere"
+        },
+        "idea-search.maxFilesToSearch": {
+          "type": "number",
+          "default": 5000,
+          "minimum": 100,
+          "maximum": 50000,
+          "description": "Maximum number of files to search (larger values may be slow)"
+        },
+        "idea-search.defaultScope": {
+          "type": "string",
+          "default": "project",
+          "enum": ["project", "open-files", "current-file", "git-changed"],
+          "description": "Default scope for Find in Files"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "lint": "eslint src --ext ts"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.74.0",
+    "@types/node": "18.x",
+    "typescript": "^5.3.0"
+  }
+}
