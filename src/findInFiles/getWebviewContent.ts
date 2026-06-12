@@ -6,13 +6,12 @@ export function getWebviewContent(
     extensionUri: vscode.Uri,
     mode: 'popup' | 'panel',
 ): string {
-    const styleUri = webview.asWebviewUri(
-        vscode.Uri.joinPath(extensionUri, 'media', 'findInFiles', 'style.css'),
-    );
-    const scriptUri = webview.asWebviewUri(
-        vscode.Uri.joinPath(extensionUri, 'media', 'findInFiles', 'main.js'),
-    );
-    const nonce = crypto.randomBytes(16).toString('hex');
+    const styleUri  = webview.asWebviewUri(vscode.Uri.joinPath(extensionUri, 'media', 'findInFiles', 'style.css'));
+    const scriptUri = webview.asWebviewUri(vscode.Uri.joinPath(extensionUri, 'media', 'findInFiles', 'main.js'));
+    const nonce     = crypto.randomBytes(16).toString('hex');
+    const openInTab = mode === 'popup'
+        ? '<button class="open-in-tab-btn" id="btnOpenInTab">Open in Tab</button>'
+        : '';
 
     return `<!DOCTYPE html>
 <html lang="en">
@@ -30,18 +29,26 @@ export function getWebviewContent(
   <div class="backdrop" id="backdrop"></div>
   <div class="dialog" id="dialog">
 
+    <!-- ── F3 Tab bar ── -->
+    <div class="tab-bar" id="tabBar"></div>
+
     <!-- ── Toolbar ── -->
     <div class="toolbar">
       <div class="search-row">
-        <button class="toggle-replace-btn" id="toggleReplace" title="Toggle Replace (Ctrl+H)">▶</button>
+        <button class="toggle-replace-btn" id="toggleReplace" title="Toggle Replace">▶</button>
         <div class="search-input-wrap" id="searchWrap">
           <span class="input-icon">⌕</span>
           <input type="text" id="searchInput" class="text-input" placeholder="Search…"
                  autocomplete="off" spellcheck="false">
           <div class="flag-group">
-            <button class="flag-btn" id="btnCase"  data-flag="case"  title="Case Sensitive (Alt+C)">Aa</button>
-            <button class="flag-btn" id="btnWord"  data-flag="word"  title="Whole Word (Alt+W)">W</button>
-            <button class="flag-btn" id="btnRegex" data-flag="regex" title="Regular Expression (Alt+R)">.*</button>
+            <button class="flag-btn" id="btnCase"  data-flag="case"  title="Case Sensitive">Aa</button>
+            <button class="flag-btn" id="btnWord"  data-flag="word"  title="Whole Word">W</button>
+            <button class="flag-btn" id="btnRegex" data-flag="regex" title="Regular Expression">.*</button>
+          </div>
+          <!-- F7 History -->
+          <div class="history-wrap">
+            <button class="icon-btn hist-btn" id="btnHistory" title="Search history">🕐</button>
+            <div class="history-dropdown hidden" id="historyDropdown"></div>
           </div>
         </div>
       </div>
@@ -59,6 +66,7 @@ export function getWebviewContent(
       <div class="options-row">
         <label class="opt-label">Scope</label>
         <select id="scopeSelect" class="opt-select"></select>
+        <button class="icon-btn" id="btnManageScopes" title="Manage custom scopes">⚙</button>
         <label class="opt-label">File mask</label>
         <input type="text" id="maskInput" class="mask-input text-input"
                placeholder="*.ts, !**/*.d.ts" autocomplete="off" spellcheck="false"
@@ -78,21 +86,33 @@ export function getWebviewContent(
       </div>
     </div>
 
-    <!-- ── Results ── -->
+    <!-- ── Results + F8 Preview ── -->
     <div class="results-area" id="resultsArea">
       <div class="empty-state" id="emptyState">
         <span class="empty-icon">⌕</span>
         <span class="empty-text">Enter a search query to find in files</span>
       </div>
       <div class="results-list" id="resultsList"></div>
+
+      <!-- F8 Preview pane -->
+      <div class="preview-pane hidden" id="previewPane">
+        <div class="preview-header">
+          <span class="preview-title" id="previewTitle">Preview</span>
+          <button class="icon-btn" id="btnClosePreview" title="Close preview">×</button>
+        </div>
+        <div class="preview-content" id="previewContent"></div>
+      </div>
     </div>
 
     <!-- ── Status bar ── -->
     <div class="status-bar">
       <span class="status-text" id="statusText"></span>
       <div class="status-actions">
-        <button class="icon-btn" id="btnToggleView" title="Toggle Tree / Flat View">⊞</button>
-        ${mode === 'popup' ? '<button class="open-in-tab-btn" id="btnOpenInTab">Open in Tab</button>' : ''}
+        <button class="icon-btn" id="btnPreview"     title="Toggle preview (F8)">👁</button>
+        <button class="icon-btn" id="btnExpandAll"   title="Expand all">⊞</button>
+        <button class="icon-btn" id="btnCollapseAll" title="Collapse all">⊟</button>
+        <button class="icon-btn" id="btnToggleView"  title="Toggle Tree / Flat view">🌲</button>
+        ${openInTab}
       </div>
     </div>
 
@@ -103,3 +123,4 @@ export function getWebviewContent(
 </body>
 </html>`;
 }
+

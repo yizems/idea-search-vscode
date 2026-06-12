@@ -20,6 +20,11 @@
         "command": "idea-search.searchEverywhere",
         "title": "Search Everywhere",
         "category": "IDEA Search"
+      },
+      {
+        "command": "idea-search.manageScopes",
+        "title": "Manage Custom Scopes",
+        "category": "IDEA Search"
       }
     ],
     "keybindings": [
