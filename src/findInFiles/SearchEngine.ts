@@ -261,8 +261,22 @@ async function searchWithRipgrep(
         let totalFiles   = 0;
         let fileCount    = 0;
 
-        const fileMap = new Map<string, SearchResultFile>();
+        // Build pattern ONCE here, not inside the per-line loop
+        const linePat = buildPattern(query);
+
+        // Buffer current file; emit only when we move to the NEXT file
+        let currentUri: string | null = null;
+        let currentResult: SearchResultFile | null = null;
         let buf = '';
+
+        function flush() {
+            if (currentResult && currentResult.matches.length > 0) {
+                onResult(currentResult);
+                totalFiles++;
+            }
+            currentResult = null;
+            currentUri    = null;
+        }
 
         const proc = require('child_process').spawn(rgPath, args, {
             cwd: workspacePath,
@@ -277,38 +291,36 @@ async function searchWithRipgrep(
             const lines = buf.split('\n');
             buf = lines.pop() ?? '';
 
-            for (const line of lines) {
-                if (!line) { continue; }
-                // Format: <file>\0<linenum>:<match-text>
-                const nulIdx = line.indexOf('\0');
+            for (const rawLine of lines) {
+                if (!rawLine) { continue; }
+                // Output format with --null: <filepath>\0<linenum>:<content>
+                const nulIdx = rawLine.indexOf('\0');
                 if (nulIdx === -1) { continue; }
-                const filePart  = line.slice(0, nulIdx);
-                const rest      = line.slice(nulIdx + 1);
-                const colonIdx  = rest.indexOf(':');
+                const filePart = rawLine.slice(0, nulIdx);
+                const rest     = rawLine.slice(nulIdx + 1);
+                const colonIdx = rest.indexOf(':');
                 if (colonIdx === -1) { continue; }
-                const lineNum   = parseInt(rest.slice(0, colonIdx), 10) - 1; // 0-indexed
-                const lineText  = rest.slice(colonIdx + 1);
+                const lineNum  = parseInt(rest.slice(0, colonIdx), 10) - 1; // 0-indexed
+                const lineText = rest.slice(colonIdx + 1);
 
                 const uriString = vscode.Uri.file(filePart).toString();
 
-                if (!fileMap.has(uriString)) {
+                // New file: flush previous, start a new buffer
+                if (uriString !== currentUri) {
+                    flush();
                     if (fileCount >= maxFiles) { continue; }
                     const relativePath = path.relative(workspacePath, filePart).replace(/\\/g, '/');
-                    const fileResult: SearchResultFile = { uriString, relativePath, matches: [] };
-                    fileMap.set(uriString, fileResult);
+                    currentResult = { uriString, relativePath, matches: [] };
+                    currentUri    = uriString;
                     fileCount++;
-                    totalFiles++;
-                    // Emit file result immediately for streaming
-                    onResult(fileResult);
                 }
 
-                // Find match positions within the line using original pattern
-                const pat = buildPattern(query);
-                if (!pat) { continue; }
-                pat.lastIndex = 0;
+                if (!currentResult || !linePat) { continue; }
+
+                linePat.lastIndex = 0;
                 let m: RegExpExecArray | null;
-                while ((m = pat.exec(lineText)) !== null) {
-                    fileMap.get(uriString)!.matches.push({
+                while ((m = linePat.exec(lineText)) !== null) {
+                    currentResult.matches.push({
                         lineNumber: lineNum,
                         lineText,
                         matchStart: m.index,
@@ -319,8 +331,15 @@ async function searchWithRipgrep(
             }
         });
 
-        proc.on('close', () => resolve({ totalMatches, totalFiles }));
-        proc.on('error', () => resolve({ totalMatches, totalFiles }));
+        proc.on('close', () => {
+            flush(); // emit the last buffered file
+            resolve({ totalMatches, totalFiles });
+        });
+        proc.on('error', (err: Error) => {
+            // rg binary not found or failed to spawn — log and resolve empty
+            console.error('[idea-search] ripgrep spawn error:', err.message);
+            resolve({ totalMatches, totalFiles });
+        });
     });
 }
 
