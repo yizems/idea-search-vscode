@@ -3,6 +3,7 @@
   "displayName": "IDEA Search",
   "description": "IntelliJ IDEA-like search experience for VS Code — floating popup, multi-tab sessions, custom scopes",
   "version": "0.1.0",
+  "publisher": "local",
   "engines": {
     "vscode": "^1.74.0"
   },
@@ -90,7 +91,8 @@
     "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
-    "lint": "eslint src --ext ts"
+    "lint": "eslint src --ext ts",
+    "package": "vsce package --no-dependencies --allow-missing-repository"
   },
   "devDependencies": {
     "@types/vscode": "^1.74.0",
