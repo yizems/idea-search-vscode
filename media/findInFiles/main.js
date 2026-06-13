@@ -61,6 +61,80 @@
   const btnPreview=     $('btnPreview');
   const btnClosePreview=$('btnClosePreview');
   const btnManageScopes=$('btnManageScopes');
+  const resultsPane=    $('resultsPane');
+  const paneSplitter=   $('paneSplitter');
+
+  // ── Drag: pane splitter (results ↕ preview) ───────────────────────
+  if (paneSplitter) {
+    paneSplitter.addEventListener('mousedown', e => {
+      e.preventDefault();
+      paneSplitter.classList.add('dragging');
+      const resultsArea = paneSplitter.parentElement;
+      const startY      = e.clientY;
+      const startH      = resultsPane ? resultsPane.getBoundingClientRect().height : 200;
+      const totalH      = resultsArea ? resultsArea.getBoundingClientRect().height : 600;
+
+      function onMove(ev) {
+        const delta = ev.clientY - startY;
+        const newH  = Math.max(60, Math.min(totalH - 80, startH + delta));
+        if (resultsPane) {
+          resultsPane.style.flex = 'none';
+          resultsPane.style.height = newH + 'px';
+        }
+        if (previewPane) {
+          previewPane.style.height = (totalH - newH - paneSplitter.offsetHeight) + 'px';
+        }
+      }
+      function onUp() {
+        paneSplitter.classList.remove('dragging');
+        document.removeEventListener('mousemove', onMove);
+        document.removeEventListener('mouseup',   onUp);
+      }
+      document.addEventListener('mousemove', onMove);
+      document.addEventListener('mouseup',   onUp);
+    });
+  }
+
+  // ── Drag: popup dialog resize (bottom / right / corner) ──────────
+  if (MODE === 'popup') {
+    const dialog  = $('dialog');
+    const resizeS  = $('resizeS');
+    const resizeE  = $('resizeE');
+    const resizeSE = $('resizeSE');
+
+    function makeResizer(handle, resizeW, resizeH) {
+      if (!handle || !dialog) return;
+      handle.addEventListener('mousedown', e => {
+        e.preventDefault();
+        const startX = e.clientX;
+        const startY = e.clientY;
+        const startW = dialog.offsetWidth;
+        const startH = dialog.offsetHeight;
+
+        function onMove(ev) {
+          if (resizeW) {
+            const newW = Math.max(520, startW + (ev.clientX - startX));
+            dialog.style.width = newW + 'px';
+          }
+          if (resizeH) {
+            const newH = Math.max(300, Math.min(window.innerHeight - 30, startH + (ev.clientY - startY)));
+            dialog.style.height = newH + 'px';
+            dialog.style.maxHeight = 'none';
+          }
+        }
+        function onUp() {
+          document.removeEventListener('mousemove', onMove);
+          document.removeEventListener('mouseup',   onUp);
+        }
+        document.addEventListener('mousemove', onMove);
+        document.addEventListener('mouseup',   onUp);
+      });
+    }
+
+    makeResizer(resizeS,  false, true);
+    makeResizer(resizeE,  true,  false);
+    makeResizer(resizeSE, true,  true);
+  }
 
   // ── F3 Tab bar ───────────────────────────────────────────────────────
   function renderTabs() {
@@ -206,7 +280,7 @@
     resultsList.innerHTML='';
     if (msg!=null) { emptyState.style.display='flex'; emptyState.querySelector('.empty-text').textContent=msg; }
     else emptyState.style.display='none';
-    if (previewPane) previewPane.classList.add('hidden');
+    // keep preview pane visibility as-is (controlled by toggle button)
   }
   function setStatus(t) { statusText.textContent=t||''; }
   function focusFirstResult() { const f=resultsList.querySelector('.match-item'); if(f) f.focus(); }
@@ -422,9 +496,18 @@
   btnExpandAll.addEventListener('click',()=>{ resultsList.querySelectorAll('.file-group.collapsed,.dir-group.collapsed').forEach(el=>{ el.classList.remove('collapsed'); const a=el.querySelector('.collapse-icon,.dir-arrow'); if(a) a.textContent='▼'; }); });
   btnCollapseAll.addEventListener('click',()=>{ resultsList.querySelectorAll('.file-group:not(.collapsed),.dir-group:not(.collapsed)').forEach(el=>{ el.classList.add('collapsed'); const a=el.querySelector('.collapse-icon,.dir-arrow'); if(a) a.textContent='▶'; }); });
   if (btnHistory) btnHistory.addEventListener('click',e=>{ e.stopPropagation(); historyDropdown.classList.contains('hidden')?openHistoryDropdown():historyDropdown.classList.add('hidden'); });
-  if (btnPreview) { btnPreview.addEventListener('click',()=>{ state.showPreview=!state.showPreview; btnPreview.classList.toggle('active',state.showPreview); if(!state.showPreview&&previewPane) previewPane.classList.add('hidden'); saveState(); }); btnPreview.classList.toggle('active',state.showPreview); }
-  if (btnClosePreview) btnClosePreview.addEventListener('click',()=>{ if(previewPane) previewPane.classList.add('hidden'); });
+  if (btnPreview) { btnPreview.addEventListener('click',()=>{ state.showPreview=!state.showPreview; btnPreview.classList.toggle('active',state.showPreview); setPreviewVisible(state.showPreview); saveState(); }); btnPreview.classList.toggle('active',state.showPreview); }
+  if (btnClosePreview) btnClosePreview.addEventListener('click',()=>{ state.showPreview=false; if(btnPreview) btnPreview.classList.remove('active'); setPreviewVisible(false); saveState(); });
   document.addEventListener('click',e=>{ if(historyDropdown&&!historyDropdown.contains(e.target)&&e.target!==btnHistory) historyDropdown.classList.add('hidden'); });
+
+  // ── Preview visibility helper ─────────────────────────────────────
+  function setPreviewVisible(visible) {
+    if (previewPane)   { previewPane.classList.toggle('hidden',  !visible); }
+    if (paneSplitter)  { paneSplitter.classList.toggle('hidden', !visible); }
+    if (!visible && resultsPane) { resultsPane.style.flex=''; resultsPane.style.height=''; }
+  }
+  // Apply initial state
+  setPreviewVisible(state.showPreview);
 
   // ── Helpers ──────────────────────────────────────────────────────────
   function openFile(u,l,nc) { vscode.postMessage({cmd:'openFile',uriString:u,lineNumber:l,inNewColumn:!!nc}); }

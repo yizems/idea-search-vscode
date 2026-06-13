@@ -30,13 +30,13 @@
     "keybindings": [
       {
         "command": "idea-search.findInFiles",
-        "key": "ctrl+shift+f",
-        "mac": "cmd+shift+f"
+        "key": "ctrl+alt+f",
+        "mac": "cmd+alt+f"
       },
       {
         "command": "idea-search.searchEverywhere",
-        "key": "shift+shift",
-        "mac": "shift+shift"
+        "key": "ctrl+alt+shift+f",
+        "mac": "cmd+alt+shift+f"
       }
     ],
     "views": {

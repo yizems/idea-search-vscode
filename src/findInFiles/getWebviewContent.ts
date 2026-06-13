@@ -88,11 +88,17 @@ export function getWebviewContent(
 
     <!-- ── Results + F8 Preview ── -->
     <div class="results-area" id="resultsArea">
-      <div class="empty-state" id="emptyState">
-        <span class="empty-icon">⌕</span>
-        <span class="empty-text">Enter a search query to find in files</span>
+      <!-- Upper pane: result list -->
+      <div class="results-pane" id="resultsPane">
+        <div class="empty-state" id="emptyState">
+          <span class="empty-icon">⌕</span>
+          <span class="empty-text">Enter a search query to find in files</span>
+        </div>
+        <div class="results-list" id="resultsList"></div>
       </div>
-      <div class="results-list" id="resultsList"></div>
+
+      <!-- Horizontal splitter (only visible when preview is open) -->
+      <div class="pane-splitter hidden" id="paneSplitter"></div>
 
       <!-- F8 Preview pane -->
       <div class="preview-pane hidden" id="previewPane">
@@ -117,6 +123,11 @@ export function getWebviewContent(
     </div>
 
   </div><!-- /dialog -->
+
+  <!-- Resize handles (popup only) -->
+  <div class="resize-handle-s"  id="resizeS"></div>
+  <div class="resize-handle-e"  id="resizeE"></div>
+  <div class="resize-handle-se" id="resizeSE"></div>
 
   <script nonce="${nonce}">window.__IDEA_SEARCH_MODE = '${mode}';</script>
   <script nonce="${nonce}" src="${scriptUri}"></script>
