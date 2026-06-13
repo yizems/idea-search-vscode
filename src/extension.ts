@@ -1,6 +1,5 @@
 import * as vscode from 'vscode';
 import { FindInFilesView } from './findInFiles/FindInFilesView';
-import { FindInFilesPanel } from './findInFiles/FindInFilesPanel';
 import { SearchEverywhereView } from './searchEverywhere/SearchEverywhereView';
 import { ScopeManager } from './shared/ScopeManager';
 
@@ -8,34 +7,24 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     const scopeManager = new ScopeManager(context);
     await scopeManager.load();
 
-    // Register persistent bottom-panel view
-    const panelProvider = new FindInFilesPanel(context, scopeManager);
-    context.subscriptions.push(
-        vscode.window.registerWebviewViewProvider(
-            FindInFilesPanel.viewType,
-            panelProvider,
-            { webviewOptions: { retainContextWhenHidden: true } },
-        ),
-    );
-
-    // Command: Find in Files (popup)
+    // Command: Find in Files
     context.subscriptions.push(
         vscode.commands.registerCommand('idea-search.findInFiles', () => {
             FindInFilesView.show(context, scopeManager);
         }),
     );
 
-    // Command: Search Everywhere (F1)
+    // Command: Search Everywhere
     context.subscriptions.push(
         vscode.commands.registerCommand('idea-search.searchEverywhere', () => {
             SearchEverywhereView.show(context);
         }),
     );
 
-    // Command: Manage Scopes (F4)
+    // Command: Manage Scopes
     context.subscriptions.push(
         vscode.commands.registerCommand('idea-search.manageScopes', async () => {
-            await manageScopesUI(scopeManager, panelProvider);
+            await manageScopesUI(scopeManager);
         }),
     );
 }
@@ -48,7 +37,6 @@ export function deactivate(): void {
 // ── F4: Scope management via QuickInput/QuickPick ─────────────────────────
 async function manageScopesUI(
     scopeManager: ScopeManager,
-    panel: FindInFilesPanel,
 ): Promise<void> {
     const ADD_SCOPE_LABEL = '$(add)  Add new scope';
 
@@ -75,13 +63,13 @@ async function manageScopesUI(
     if (!pick) { return; }
 
     if (pick.label === ADD_SCOPE_LABEL) {
-        await addScopeUI(scopeManager, panel);
+        await addScopeUI(scopeManager);
     } else if ('scopeId' in pick) {
-        await editOrDeleteScopeUI(pick.scopeId as string, scopeManager, panel);
+        await editOrDeleteScopeUI(pick.scopeId as string, scopeManager);
     }
 }
 
-async function addScopeUI(scopeManager: ScopeManager, panel: FindInFilesPanel): Promise<void> {
+async function addScopeUI(scopeManager: ScopeManager): Promise<void> {
     const name = await vscode.window.showInputBox({ prompt: 'Scope name', placeHolder: 'e.g. Backend only' });
     if (!name) { return; }
 
@@ -105,14 +93,13 @@ async function addScopeUI(scopeManager: ScopeManager, panel: FindInFilesPanel): 
         excludePatterns: (excludeRaw ?? '').split(',').map(p => p.trim()).filter(Boolean),
     });
 
-    notifyPanelScopesChanged(panel);
+    notifyViewScopesChanged();
     vscode.window.showInformationMessage(`Scope "${name}" created.`);
 }
 
 async function editOrDeleteScopeUI(
     scopeId: string,
     scopeManager: ScopeManager,
-    panel: FindInFilesPanel,
 ): Promise<void> {
     const scope = scopeManager.getScope(scopeId);
     if (!scope) { return; }
@@ -129,7 +116,7 @@ async function editOrDeleteScopeUI(
         );
         if (confirmed !== 'Delete') { return; }
         await scopeManager.removeScope(scopeId);
-        notifyPanelScopesChanged(panel);
+        notifyViewScopesChanged();
         vscode.window.showInformationMessage(`Scope "${scope.name}" deleted.`);
         return;
     }
@@ -152,11 +139,10 @@ async function editOrDeleteScopeUI(
         includePatterns: includeRaw.split(',').map(p => p.trim()).filter(Boolean),
         excludePatterns: (excludeRaw ?? '').split(',').map(p => p.trim()).filter(Boolean),
     });
-    notifyPanelScopesChanged(panel);
+    notifyViewScopesChanged();
     vscode.window.showInformationMessage(`Scope "${name}" updated.`);
 }
 
-function notifyPanelScopesChanged(panel: FindInFilesPanel): void {
-    panel.refreshScopes();
+function notifyViewScopesChanged(): void {
     FindInFilesView.refreshScopes();
 }

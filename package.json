@@ -39,15 +39,6 @@
         "mac": "cmd+alt+shift+f"
       }
     ],
-    "views": {
-      "panel": [
-        {
-          "type": "webview",
-          "id": "idea-search.panel",
-          "name": "IDEA Search"
-        }
-      ]
-    },
     "configuration": {
       "title": "IDEA Search",
       "properties": {
