@@ -55,6 +55,12 @@ const DEFAULT_EXCLUDE = [
     '**/build/**',
     '**/.next/**',
     '**/coverage/**',
+    // macOS metadata & package formats
+    '**/.DS_Store',
+    '**/__MACOSX/**',
+    '**/*.xcodeproj/**',
+    '**/*.xcworkspace/**',
+    '**/*.xcarchive/**',
 ];
 
 async function getFilesForScope(

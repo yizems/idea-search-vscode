@@ -78,7 +78,8 @@
             "mp3", "mp4", "wav", "avi", "mov", "mkv", "flac",
             "pdf", "doc", "docx", "xls", "xlsx", "ppt", "pptx",
             "woff", "woff2", "ttf", "otf", "eot",
-            "db", "sqlite", "sqlite3"
+            "db", "sqlite", "sqlite3",
+            "dmg", "pkg", "app", "ipa", "a", "framework"
           ],
           "description": "File extensions to exclude from search results (without leading dot). Set to [] to disable."
         }
