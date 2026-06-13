@@ -7,7 +7,9 @@
   "engines": {
     "vscode": "^1.74.0"
   },
-  "categories": ["Other"],
+  "categories": [
+    "Other"
+  ],
   "activationEvents": [],
   "main": "./out/extension.js",
   "contributes": {
@@ -65,22 +67,74 @@
         "idea-search.defaultScope": {
           "type": "string",
           "default": "project",
-          "enum": ["project", "open-files", "current-file", "git-changed"],
+          "enum": [
+            "project",
+            "open-files",
+            "current-file",
+            "git-changed"
+          ],
           "description": "Default scope for Find in Files"
         },
         "idea-search.excludeBinaryExtensions": {
           "type": "array",
-          "items": { "type": "string" },
+          "items": {
+            "type": "string"
+          },
           "default": [
-            "bin", "exe", "dll", "so", "dylib", "obj", "o",
-            "jar", "war", "ear", "class",
-            "zip", "tar", "gz", "bz2", "xz", "7z", "rar",
-            "png", "jpg", "jpeg", "gif", "bmp", "ico", "webp", "svg",
-            "mp3", "mp4", "wav", "avi", "mov", "mkv", "flac",
-            "pdf", "doc", "docx", "xls", "xlsx", "ppt", "pptx",
-            "woff", "woff2", "ttf", "otf", "eot",
-            "db", "sqlite", "sqlite3",
-            "dmg", "pkg", "app", "ipa", "a", "framework"
+            "bin",
+            "exe",
+            "dll",
+            "so",
+            "dylib",
+            "obj",
+            "o",
+            "jar",
+            "war",
+            "ear",
+            "class",
+            "zip",
+            "tar",
+            "gz",
+            "bz2",
+            "xz",
+            "7z",
+            "rar",
+            "png",
+            "jpg",
+            "jpeg",
+            "gif",
+            "bmp",
+            "ico",
+            "webp",
+            "svg",
+            "mp3",
+            "mp4",
+            "wav",
+            "avi",
+            "mov",
+            "mkv",
+            "flac",
+            "pdf",
+            "doc",
+            "docx",
+            "xls",
+            "xlsx",
+            "ppt",
+            "pptx",
+            "woff",
+            "woff2",
+            "ttf",
+            "otf",
+            "eot",
+            "db",
+            "sqlite",
+            "sqlite3",
+            "dmg",
+            "pkg",
+            "app",
+            "ipa",
+            "a",
+            "framework"
           ],
           "description": "File extensions to exclude from search results (without leading dot). Set to [] to disable."
         }
@@ -95,8 +149,9 @@
     "package": "vsce package --no-dependencies --allow-missing-repository"
   },
   "devDependencies": {
-    "@types/vscode": "^1.74.0",
     "@types/node": "18.x",
+    "@types/vscode": "^1.74.0",
+    "@vscode/vsce": "^3.9.2",
     "typescript": "^5.3.0"
   }
 }
