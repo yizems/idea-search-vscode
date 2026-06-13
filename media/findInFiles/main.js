@@ -382,12 +382,16 @@
     }
     item.addEventListener('click',e=>{
       if (e.target===eb||(e.target instanceof HTMLButtonElement)) return;
-      openFile(file.uriString,match.lineNumber,e.ctrlKey||e.metaKey);
-      // Preview on click only
+      // Single click: update preview only
       if (state.showPreview) {
         vscode.postMessage({cmd:'previewFile',uriString:file.uriString,lineNumber:match.lineNumber});
         if (previewTitle) previewTitle.textContent=file.relativePath+':'+(match.lineNumber+1);
       }
+    });
+    item.addEventListener('dblclick',e=>{
+      if (e.target===eb||(e.target instanceof HTMLButtonElement)) return;
+      // Double click: open source file
+      openFile(file.uriString,match.lineNumber,e.ctrlKey||e.metaKey);
     });
     item.addEventListener('keydown',e=>{
       if (e.key==='Enter') openFile(file.uriString,match.lineNumber,false);
