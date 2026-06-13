@@ -14,8 +14,6 @@ body {
   flex-direction: column;
 }
 
-.backdrop { display: none !important; }
-
 /* Dialog = full tab */
 .dialog {
   flex: 1;

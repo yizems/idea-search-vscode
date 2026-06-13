@@ -29,7 +29,7 @@ export function getSearchEverywhereHtml(
       <span class="search-icon">⌕</span>
       <input type="text" id="seInput" class="se-input" placeholder="Search everywhere…"
              autocomplete="off" spellcheck="false">
-      <span class="shortcut-hint">↑↓ navigate · Enter open · Tab switch</span>
+      <span class="shortcut-hint">↑3 navigate · Enter open · Tab switch category</span>
     </div>
 
     <!-- Tabs: All / Files / Symbols / Text / Actions -->

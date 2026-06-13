@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
-import { FindInFilesPopup } from './findInFiles/FindInFilesPopup';
+import { FindInFilesView } from './findInFiles/FindInFilesView';
 import { FindInFilesPanel } from './findInFiles/FindInFilesPanel';
-import { SearchEverywherePopup } from './searchEverywhere/SearchEverywherePopup';
+import { SearchEverywhereView } from './searchEverywhere/SearchEverywhereView';
 import { ScopeManager } from './shared/ScopeManager';
 
 export async function activate(context: vscode.ExtensionContext): Promise<void> {
@@ -21,14 +21,14 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     // Command: Find in Files (popup)
     context.subscriptions.push(
         vscode.commands.registerCommand('idea-search.findInFiles', () => {
-            FindInFilesPopup.show(context, scopeManager);
+            FindInFilesView.show(context, scopeManager);
         }),
     );
 
     // Command: Search Everywhere (F1)
     context.subscriptions.push(
         vscode.commands.registerCommand('idea-search.searchEverywhere', () => {
-            SearchEverywherePopup.show(context);
+            SearchEverywhereView.show(context);
         }),
     );
 
@@ -41,8 +41,8 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 }
 
 export function deactivate(): void {
-    FindInFilesPopup.dispose();
-    SearchEverywherePopup.dispose();
+    FindInFilesView.dispose();
+    SearchEverywhereView.dispose();
 }
 
 // ── F4: Scope management via QuickInput/QuickPick ─────────────────────────
@@ -50,15 +50,11 @@ async function manageScopesUI(
     scopeManager: ScopeManager,
     panel: FindInFilesPanel,
 ): Promise<void> {
-    const ACTIONS = {
-        ADD:    '$(add)  Add new scope',
-        EDIT:   '$(edit) Edit scope',
-        DELETE: '$(trash) Delete scope',
-    };
+    const ADD_SCOPE_LABEL = '$(add)  Add new scope';
 
     const pick = await vscode.window.showQuickPick(
         [
-            { label: ACTIONS.ADD, kind: vscode.QuickPickItemKind.Default },
+            { label: ADD_SCOPE_LABEL, kind: vscode.QuickPickItemKind.Default },
             { label: '─', kind: vscode.QuickPickItemKind.Separator },
             ...scopeManager.getAllScopes()
                 .filter(s => !s.isBuiltin)
@@ -78,7 +74,7 @@ async function manageScopesUI(
     );
     if (!pick) { return; }
 
-    if (pick.label === ACTIONS.ADD) {
+    if (pick.label === ADD_SCOPE_LABEL) {
         await addScopeUI(scopeManager, panel);
     } else if ('scopeId' in pick) {
         await editOrDeleteScopeUI(pick.scopeId as string, scopeManager, panel);
@@ -162,5 +158,5 @@ async function editOrDeleteScopeUI(
 
 function notifyPanelScopesChanged(panel: FindInFilesPanel): void {
     panel.refreshScopes();
-    FindInFilesPopup.refreshScopes();
+    FindInFilesView.refreshScopes();
 }

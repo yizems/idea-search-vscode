@@ -43,19 +43,7 @@ body.mode-panel { display: flex; flex-direction: column; height: 100vh; }
 body.mode-panel .backdrop { display: none; }
 body.mode-panel .dialog   { flex: 1; overflow: hidden; }
 
-/* 鈹€鈹€ Resize handles (popup only) 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€ */
-.resize-handle-s,
-.resize-handle-e,
-.resize-handle-se {
-  position: absolute;
-  z-index: 10001;
-  display: none;
-}
-body.mode-popup .resize-handle-s  { display: block; height: 7px; cursor: ns-resize;   bottom: -4px; left: 8px; right: 8px; }
-body.mode-popup .resize-handle-e  { display: block; width: 7px;  cursor: ew-resize;   top: 8px; bottom: 8px; right: -4px; }
-body.mode-popup .resize-handle-se { display: block; width: 16px; height: 16px; cursor: nwse-resize; bottom: -4px; right: -4px; }
-
-/* 鈹€鈹€ Dialog base 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€ */
+/* Dialog base */
 .dialog {
   display: flex;
   flex-direction: column;
@@ -415,14 +403,8 @@ body.mode-popup .resize-handle-se { display: block; width: 16px; height: 16px; c
 }
 .icon-btn:hover  { background: var(--vscode-list-hoverBackground); color: var(--vscode-foreground); }
 .icon-btn.active { color: var(--vscode-focusBorder, #0078d4); }
-.open-in-tab-btn {
-  background: var(--vscode-button-background); color: var(--vscode-button-foreground);
-  border: none; border-radius: 3px; padding: 3px 10px; cursor: pointer;
-  font-size: 12px; font-family: inherit;
-}
-.open-in-tab-btn:hover { background: var(--vscode-button-hoverBackground); }
 
-/* 鈹€鈹€ Scrollbars 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€ */
+/* Scrollbars 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€ */
 .results-pane::-webkit-scrollbar,
 .history-dropdown::-webkit-scrollbar,
 .preview-content::-webkit-scrollbar { width: 5px; }

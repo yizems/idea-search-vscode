@@ -1,7 +1,8 @@
 import * as vscode from 'vscode';
 import { getSearchEverywhereHtml } from './getWebviewContent';
+import { sendPreview } from '../findInFiles/messageHandler';
 
-export class SearchEverywherePopup {
+export class SearchEverywhereView {
     private static panel?: vscode.WebviewPanel;
     private static cts?: vscode.CancellationTokenSource;
 
@@ -85,16 +86,7 @@ export class SearchEverywherePopup {
             case 'previewFile': {
                 const uri  = vscode.Uri.parse(msg.uriString as string);
                 const line = (msg.lineNumber as number) ?? 0;
-                try {
-                    const doc = await vscode.workspace.openTextDocument(uri);
-                    const startLine = Math.max(0, line - 8);
-                    const endLine   = Math.min(doc.lineCount - 1, line + 8);
-                    const lines: string[] = [];
-                    for (let i = startLine; i <= endLine; i++) {
-                        lines.push(doc.lineAt(i).text);
-                    }
-                    panel.webview.postMessage({ cmd: 'previewContent', lines, startLine, matchLine: line });
-                } catch { /* ignore */ }
+                await sendPreview(uri, line, msg2 => panel.webview.postMessage(msg2), msg.uriString as string);
                 break;
             }
         }
@@ -115,7 +107,6 @@ export class SearchEverywherePopup {
         // ── Files ────────────────────────────────────────────────────
         if (tab === 'all' || tab === 'files') {
             if (!token.isCancellationRequested) {
-                const pattern = `**/*${query.replace(/[\\^$.*+?()[\]{}|]/g, '\\$&')}*`;
                 const uris = await vscode.workspace.findFiles('**/*', '**/node_modules/**', 200, token);
                 const lcQuery = query.toLowerCase();
                 const filtered = uris

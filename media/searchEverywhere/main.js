@@ -241,7 +241,7 @@
     sePreview.appendChild(code);
 
     const matchRow = code.querySelector('.match-line');
-    if (matchRow) { matchRow.scrollIntoView({ block: 'center', behavior: 'instant' }); }
+    if (matchRow) { matchRow.scrollIntoView({ block: 'center', behavior: 'auto' }); }
   }
 
   // ── Message bus ───────────────────────────────────────────────────

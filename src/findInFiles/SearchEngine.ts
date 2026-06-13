@@ -75,11 +75,18 @@ async function getFilesForScope(
     }
 
     if (scope.id === 'open-files') {
+        const seen = new Set<string>();
         const uris: vscode.Uri[] = [];
         for (const group of vscode.window.tabGroups.all) {
             for (const tab of group.tabs) {
                 const input = tab.input as { uri?: vscode.Uri } | undefined;
-                if (input?.uri) { uris.push(input.uri); }
+                if (input?.uri) {
+                    const key = input.uri.toString();
+                    if (!seen.has(key)) {
+                        seen.add(key);
+                        uris.push(input.uri);
+                    }
+                }
             }
         }
         return uris;
@@ -105,13 +112,27 @@ function getGitChangedFiles(token: vscode.CancellationToken): Promise<vscode.Uri
             { cwd: workspaceFolder.uri.fsPath, timeout: 8000 },
             (err, stdout) => {
                 if (err || !stdout) { resolve([]); return; }
-                const files = stdout
-                    .split('\0')
+                // --porcelain -z: entries are NUL-separated, each entry is "XY path" or "XY src\0dest" for renames
+                const entries = stdout.split('\0').filter(Boolean);
+                const paths: string[] = [];
+                let i = 0;
+                while (i < entries.length) {
+                    const entry = entries[i];
+                    if (entry.length < 3) { i++; continue; }
+                    const xy = entry.slice(0, 2);
+                    const path = entry.slice(3);
+                    // R/C = rename/copy: next NUL token is the destination path
+                    if ((xy[0] === 'R' || xy[0] === 'C') && i + 1 < entries.length) {
+                        paths.push(entries[i + 1]);
+                        i += 2;
+                    } else {
+                        if (path) { paths.push(path); }
+                        i++;
+                    }
+                }
+                resolve(paths
                     .filter(Boolean)
-                    .map(line => line.slice(3).trim())
-                    .filter(Boolean)
-                    .map(f => vscode.Uri.joinPath(workspaceFolder.uri, f));
-                resolve(files);
+                    .map(f => vscode.Uri.joinPath(workspaceFolder.uri, f)));
             },
         );
         token.onCancellationRequested(() => proc.kill());
@@ -133,14 +154,13 @@ async function searchInFile(uri: vscode.Uri, pattern: RegExp): Promise<SearchMat
 
         for (let i = 0; i < lines.length; i++) {
             const line = lines[i];
-            const truncated = line.length > 500 ? line.slice(0, 500) : line;
             pattern.lastIndex = 0;
 
             let match: RegExpExecArray | null;
-            while ((match = pattern.exec(truncated)) !== null) {
+            while ((match = pattern.exec(line)) !== null) {
                 matches.push({
                     lineNumber: i,
-                    lineText: truncated,
+                    lineText: line,
                     matchStart: match.index,
                     matchEnd: match.index + match[0].length,
                 });

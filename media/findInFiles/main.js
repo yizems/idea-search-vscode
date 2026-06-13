@@ -48,12 +48,10 @@
   const btnRegex=       $('btnRegex');
   const toggleReplace=  $('toggleReplace');
   const replaceRow=     $('replaceRow');
-  const btnOpenInTab=   $('btnOpenInTab');
   const btnToggleView=  $('btnToggleView');
   const btnExpandAll=   $('btnExpandAll');
   const btnCollapseAll= $('btnCollapseAll');
   const btnReplaceAll=  $('btnReplaceAll');
-  const backdrop=       $('backdrop');
   const previewPane=    $('previewPane');
   const previewContent= $('previewContent');
   const previewTitle=   $('previewTitle');
@@ -471,7 +469,7 @@
       previewContent.appendChild(row);
     }
     const mr=previewContent.querySelector('.preview-match-line');
-    if (mr) mr.scrollIntoView({block:'center',behavior:'instant'});
+    if (mr) mr.scrollIntoView({block:'center',behavior:'auto'});
   }
 
   // ── Event handlers ───────────────────────────────────────────────────
@@ -499,8 +497,6 @@
     if(!h) replaceInput.focus();
     const s=activeSession(); if(s&&s.results.length) rerenderResults(s);
   });
-  if (btnOpenInTab) btnOpenInTab.addEventListener('click',()=>{ const s=activeSession(); if(s) vscode.postMessage({cmd:'openInTab',query:Object.assign({},s.query)}); });
-  if (backdrop) backdrop.addEventListener('click',()=>vscode.postMessage({cmd:'close'}));
   if (btnManageScopes) btnManageScopes.addEventListener('click',()=>vscode.postMessage({cmd:'manageScopes'}));
   if (btnReplaceAll) btnReplaceAll.addEventListener('click',()=>{
     const s=activeSession(); if(!s) return;
@@ -573,6 +569,15 @@
         if(s){s.status=`Error: ${msg.message}`;if(s.id===state.activeSessionId)setStatus(s.status);renderTabs();} break;
       }
       case 'previewContent': renderPreview(msg.lines,msg.startLine,msg.matchLine,msg.uriString); break;
+      case 'replaceAllDone': {
+        // Re-trigger search so results reflect the replacement
+        const s=state.sessions.find(s=>s.id===msg.sessionId); if(!s) break;
+        s.results=[]; s.totalMatches=0; s.totalFiles=0;
+        s.status='Replace complete — re-searching…';
+        if(s.id===state.activeSessionId){rerenderResults(s);setStatus(s.status);}
+        vscode.postMessage({cmd:'search',query:Object.assign({},s.query),sessionId:s.id});
+        renderTabs(); break;
+      }
       case 'replaceFileDone': {
         const s=state.sessions.find(s=>s.id===msg.sessionId); if(!s) break;
         s.results=s.results.filter(r=>r.uriString!==msg.uriString);

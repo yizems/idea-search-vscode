@@ -1,10 +1,9 @@
 import * as vscode from 'vscode';
-import * as crypto from 'crypto';
 import { ScopeManager } from '../shared/ScopeManager';
 import { getWebviewContent } from './getWebviewContent';
 import { createFindInFilesHandler } from './messageHandler';
 
-export class FindInFilesPopup {
+export class FindInFilesView {
     private static panel?: vscode.WebviewPanel;
     private static handler?: ReturnType<typeof createFindInFilesHandler>;
 

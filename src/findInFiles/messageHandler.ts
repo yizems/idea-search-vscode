@@ -11,6 +11,26 @@ export const PENDING_QUERY_KEY  = 'idea-search.pendingQuery';
 export const PINNED_SESSIONS_KEY = 'idea-search.pinnedSessions';
 const PREVIEW_CTX = 12;
 
+/** Read lines around a given line from a document and send previewContent. */
+export async function sendPreview(
+    uri: vscode.Uri,
+    lineNumber: number,
+    send: (msg: unknown) => void,
+    uriString: string,
+    ctx = PREVIEW_CTX,
+): Promise<void> {
+    try {
+        const doc = await vscode.workspace.openTextDocument(uri);
+        const startLine = Math.max(0, lineNumber - ctx);
+        const endLine   = Math.min(doc.lineCount - 1, lineNumber + ctx);
+        const lines: string[] = [];
+        for (let i = startLine; i <= endLine; i++) {
+            lines.push(doc.lineAt(i).text);
+        }
+        send({ cmd: 'previewContent', lines, startLine, matchLine: lineNumber, uriString });
+    } catch { /* unreadable files — silently ignore */ }
+}
+
 export function createFindInFilesHandler(
     context: vscode.ExtensionContext,
     scopeManager: ScopeManager,
@@ -61,7 +81,11 @@ export function createFindInFilesHandler(
                 } catch (err) {
                     send({ cmd: 'searchError', message: String(err), sessionId });
                 } finally {
-                    ctsBySession.delete(sessionId);
+                    // Only remove from map if still ours (guard against race with newer search)
+                    if (ctsBySession.get(sessionId) === cts) {
+                        ctsBySession.delete(sessionId);
+                    }
+                    cts.dispose();
                 }
                 break;
             }
@@ -89,17 +113,7 @@ export function createFindInFilesHandler(
 
             case 'previewFile': {
                 const uri = vscode.Uri.parse(msg.uriString as string);
-                const lineNumber = msg.lineNumber as number;
-                try {
-                    const doc = await vscode.workspace.openTextDocument(uri);
-                    const startLine = Math.max(0, lineNumber - PREVIEW_CTX);
-                    const endLine   = Math.min(doc.lineCount - 1, lineNumber + PREVIEW_CTX);
-                    const lines: string[] = [];
-                    for (let i = startLine; i <= endLine; i++) {
-                        lines.push(doc.lineAt(i).text);
-                    }
-                    send({ cmd: 'previewContent', lines, startLine, matchLine: lineNumber, uriString: msg.uriString });
-                } catch { /* unreadable files — silently ignore */ }
+                await sendPreview(uri, msg.lineNumber as number, send, msg.uriString as string);
                 break;
             }
 
