@@ -375,7 +375,13 @@
     item.className='match-item'+(isExc?' excluded':''); item.setAttribute('tabindex','0'); item.dataset.key=key;
     const ln=document.createElement('span'); ln.className='line-num'; ln.textContent=String(match.lineNumber+1);
     const lt=document.createElement('span'); lt.className='line-text';
-    lt.innerHTML=highlightMatch(match.lineText,match.matchStart,match.matchEnd);
+    // Trim leading whitespace for display; adjust highlight offsets accordingly
+    const rawLine   = match.lineText;
+    const trimmed   = rawLine.trimStart();
+    const trimOffset = rawLine.length - trimmed.length;
+    const dispStart = Math.max(0, match.matchStart - trimOffset);
+    const dispEnd   = Math.max(0, match.matchEnd   - trimOffset);
+    lt.innerHTML=highlightMatch(trimmed, dispStart, dispEnd);
     const eb=document.createElement('button');
     eb.className='match-btn exclude-btn'+(isExc?' active':'');
     eb.textContent='○'; eb.title=isExc?'Include in replace':'Exclude from replace';
