@@ -122,12 +122,11 @@ export function getWebviewContent(
       </div>
     </div>
 
+    <!-- Resize handles: position:absolute inside dialog (popup only) -->
+    <div class="resize-handle-s"  id="resizeS"></div>
+    <div class="resize-handle-e"  id="resizeE"></div>
+    <div class="resize-handle-se" id="resizeSE"></div>
   </div><!-- /dialog -->
-
-  <!-- Resize handles (popup only) -->
-  <div class="resize-handle-s"  id="resizeS"></div>
-  <div class="resize-handle-e"  id="resizeE"></div>
-  <div class="resize-handle-se" id="resizeSE"></div>
 
   <script nonce="${nonce}">window.__IDEA_SEARCH_MODE = '${mode}';</script>
   <script nonce="${nonce}" src="${scriptUri}"></script>

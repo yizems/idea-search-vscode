@@ -108,17 +108,22 @@
         e.preventDefault();
         const startX = e.clientX;
         const startY = e.clientY;
-        const startW = dialog.offsetWidth;
-        const startH = dialog.offsetHeight;
+        const rect   = dialog.getBoundingClientRect();
+        const startW = rect.width;
+        const startH = rect.height;
 
         function onMove(ev) {
           if (resizeW) {
-            const newW = Math.max(520, startW + (ev.clientX - startX));
-            dialog.style.width = newW + 'px';
+            // dialog is centered via left:50% + translateX(-50%),
+            // grow/shrink symmetrically (delta applied to each side)
+            const delta = ev.clientX - startX;
+            const newW  = Math.max(520, Math.min(window.innerWidth - 40, startW + delta * 2));
+            dialog.style.width    = newW + 'px';
+            dialog.style.maxWidth = 'none';
           }
           if (resizeH) {
             const newH = Math.max(300, Math.min(window.innerHeight - 30, startH + (ev.clientY - startY)));
-            dialog.style.height = newH + 'px';
+            dialog.style.height    = newH + 'px';
             dialog.style.maxHeight = 'none';
           }
         }
