@@ -250,7 +250,8 @@
     clearTimeout(searchTimer);
     const q=getQueryFromUI(); if (!q.text.trim()) return;
     let sess=activeSession();
-    if (sess && sess.results.length===0 && !sess.isPinned && (!sess.query.text||sess.query.text===q.text)) {
+    // Reuse current tab unless it is pinned; only pinned tabs force a new tab
+    if (sess && !sess.isPinned) {
       Object.assign(sess.query,q); sess.label=q.text;
     } else {
       sess=makeSession(genId(),q); enforcedPush(sess); state.activeSessionId=sess.id;
