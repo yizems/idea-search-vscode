@@ -440,9 +440,15 @@
   }
 
   // ── F8 Preview ───────────────────────────────────────────────────────
-  function renderPreview(lines,startLine,matchLine) {
+  // Track what's currently shown in preview for dblclick navigation
+  let previewCurrentUri = null;
+
+  function renderPreview(lines, startLine, matchLine, uriString) {
     if (!previewPane||!state.showPreview) return;
-    previewPane.classList.remove('hidden'); previewContent.innerHTML='';
+    if (uriString) previewCurrentUri = uriString;
+    previewPane.classList.remove('hidden');
+    if (paneSplitter) paneSplitter.classList.remove('hidden');
+    previewContent.innerHTML='';
     for (let i=0;i<lines.length;i++) {
       const al=startLine+i;
       const row=document.createElement('div');
@@ -450,7 +456,15 @@
       const num=document.createElement('span'); num.className='preview-line-num'; num.textContent=String(al+1);
       const txt=document.createElement('span'); txt.className='preview-line-text';
       const raw=lines[i]; txt.textContent=raw.length>300?raw.slice(0,300)+'…':raw;
-      row.append(num,txt); previewContent.appendChild(row);
+      row.append(num,txt);
+      // Double-click any preview line → open that line in editor
+      row.addEventListener('dblclick', () => {
+        if (previewCurrentUri) {
+          openFile(previewCurrentUri, al, false);
+        }
+      });
+      row.style.cursor = 'default';
+      previewContent.appendChild(row);
     }
     const mr=previewContent.querySelector('.preview-match-line');
     if (mr) mr.scrollIntoView({block:'center',behavior:'instant'});
@@ -554,7 +568,7 @@
         const s=state.sessions.find(s=>s.id===msg.sessionId);
         if(s){s.status=`Error: ${msg.message}`;if(s.id===state.activeSessionId)setStatus(s.status);renderTabs();} break;
       }
-      case 'previewContent': renderPreview(msg.lines,msg.startLine,msg.matchLine); break;
+      case 'previewContent': renderPreview(msg.lines,msg.startLine,msg.matchLine,msg.uriString); break;
       case 'replaceFileDone': {
         const s=state.sessions.find(s=>s.id===msg.sessionId); if(!s) break;
         s.results=s.results.filter(r=>r.uriString!==msg.uriString);

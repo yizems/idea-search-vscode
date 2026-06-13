@@ -22,8 +22,8 @@ export function getWebviewContent(
   <link rel="stylesheet" href="${styleUri}">
   <title>Find in Files</title>
 </head>
-<body class="mode-${mode}">
-  <div class="backdrop" id="backdrop"></div>
+<body class="mode-${mode}" style="margin:0;padding:0">
+  <div class="backdrop" id="backdrop" style="display:none"></div>
   <div class="dialog" id="dialog">
 
     <!-- ── F3 Tab bar ── -->

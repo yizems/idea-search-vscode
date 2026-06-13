@@ -1,5 +1,6 @@
-﻿/* 鈹€鈹€ Reset & base 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€ */
+﻿/* ── Reset & base ──────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { margin: 0 !important; padding: 0 !important; }
 
 body {
   font-family: var(--vscode-font-family, -apple-system, 'Segoe UI', sans-serif);
@@ -330,6 +331,8 @@ body.mode-popup .resize-handle-se { display: block; width: 16px; height: 16px; c
 }
 .preview-line-num  { color: var(--vscode-editorLineNumber-foreground, #888); text-align: right; min-width: 30px; flex-shrink: 0; user-select: none; }
 .preview-line-text { flex: 1; overflow: hidden; text-overflow: ellipsis; }
+.preview-line:hover { background: var(--vscode-list-hoverBackground); cursor: pointer; }
+.preview-line:hover .preview-line-num { color: var(--vscode-foreground); }
 .preview-match-line { background: var(--vscode-editor-lineHighlightBackground, rgba(255,255,255,.05)); }
 .preview-match-line .preview-line-num { color: var(--vscode-foreground); }
 
