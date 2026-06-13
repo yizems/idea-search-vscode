@@ -13,36 +13,33 @@ body {
 
 /* 鈹€鈹€ Popup layout 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€ */
 body.mode-popup {
-  /* body itself is a neutral dark bg so the backdrop overlay is visible */
-  background: #111 !important;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: var(--vscode-editor-background);
 }
-body.mode-popup .backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.72);
-  backdrop-filter: blur(2px);
-  z-index: 9998;
-}
-/* Dialog: force fixed positioning with !important to beat .dialog{position:relative} */
+body.mode-popup .backdrop { display: none; }
 body.mode-popup .dialog {
-  position: fixed !important;
-  left: 50%;
-  transform: translateX(-50%);
-  top: 6vh;
-  z-index: 9999;
-  /* Clearly dialog-sized, NOT full screen */
-  width: 62%;
-  max-width: 860px;
-  min-width: 500px;
-  height: 74vh;
-  max-height: 86vh;
-  min-height: 300px;
-  border-radius: 8px;
-  /* Use widget background — slightly lighter than editor bg in dark themes */
-  background: var(--vscode-editorWidget-background, #252526) !important;
-  border: 1px solid var(--vscode-focusBorder, #0078d4) !important;
-  box-shadow: 0 8px 48px rgba(0, 0, 0, 0.85) !important;
+  flex: 1;
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  height: auto !important;
+  max-height: none !important;
+  min-height: 0 !important;
+  border-radius: 0 !important;
+  border: none !important;
+  box-shadow: none !important;
+  background: var(--vscode-editor-background) !important;
+  transform: none !important;
+  position: relative !important;
+  top: auto !important;
+  left: auto !important;
 }
+/* Hide resize handles in full-tab mode */
+body.mode-popup .resize-handle-s,
+body.mode-popup .resize-handle-e,
+body.mode-popup .resize-handle-se { display: none !important; }
 
 /* 鈹€鈹€ Panel layout 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€ */
 body.mode-panel { display: flex; flex-direction: column; height: 100vh; }

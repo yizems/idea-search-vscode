@@ -9,9 +9,6 @@ export function getWebviewContent(
     const styleUri  = webview.asWebviewUri(vscode.Uri.joinPath(extensionUri, 'media', 'findInFiles', 'style.css'));
     const scriptUri = webview.asWebviewUri(vscode.Uri.joinPath(extensionUri, 'media', 'findInFiles', 'main.js'));
     const nonce     = crypto.randomBytes(16).toString('hex');
-    const openInTab = mode === 'popup'
-        ? '<button class="open-in-tab-btn" id="btnOpenInTab">Open in Tab</button>'
-        : '';
 
     return `<!DOCTYPE html>
 <html lang="en">
@@ -118,14 +115,9 @@ export function getWebviewContent(
         <button class="icon-btn" id="btnExpandAll"   title="Expand all">⊞</button>
         <button class="icon-btn" id="btnCollapseAll" title="Collapse all">⊟</button>
         <button class="icon-btn" id="btnToggleView"  title="Toggle Tree / Flat view">🌲</button>
-        ${openInTab}
       </div>
     </div>
 
-    <!-- Resize handles: position:absolute inside dialog (popup only) -->
-    <div class="resize-handle-s"  id="resizeS"></div>
-    <div class="resize-handle-e"  id="resizeE"></div>
-    <div class="resize-handle-se" id="resizeSE"></div>
   </div><!-- /dialog -->
 
   <script nonce="${nonce}">window.__IDEA_SEARCH_MODE = '${mode}';</script>
