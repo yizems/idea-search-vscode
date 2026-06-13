@@ -63,11 +63,12 @@ async function getFilesForScope(
     token: vscode.CancellationToken,
 ): Promise<vscode.Uri[]> {
     const { include, exclude } = parseFileMask(fileMask);
-    const allExclude = [...DEFAULT_EXCLUDE, ...scope.excludePatterns, ...exclude];
-    const excludeGlob = `{${allExclude.join(',')}}`;
-
-    const config = vscode.workspace.getConfiguration('idea-search');
+    const config     = vscode.workspace.getConfiguration('idea-search');
     const maxFiles: number = config.get('maxFilesToSearch', 5000);
+    const binaryExts: string[] = config.get('excludeBinaryExtensions', []);
+    const binaryExclude = binaryExts.map(ext => `**/*.${ext}`);
+    const allExclude = [...DEFAULT_EXCLUDE, ...scope.excludePatterns, ...exclude, ...binaryExclude];
+    const excludeGlob = `{${allExclude.join(',')}}`;
 
     if (scope.id === 'current-file') {
         const active = vscode.window.activeTextEditor;

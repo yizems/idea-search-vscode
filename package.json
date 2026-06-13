@@ -66,6 +66,21 @@
           "default": "project",
           "enum": ["project", "open-files", "current-file", "git-changed"],
           "description": "Default scope for Find in Files"
+        },
+        "idea-search.excludeBinaryExtensions": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": [
+            "bin", "exe", "dll", "so", "dylib", "obj", "o",
+            "jar", "war", "ear", "class",
+            "zip", "tar", "gz", "bz2", "xz", "7z", "rar",
+            "png", "jpg", "jpeg", "gif", "bmp", "ico", "webp", "svg",
+            "mp3", "mp4", "wav", "avi", "mov", "mkv", "flac",
+            "pdf", "doc", "docx", "xls", "xlsx", "ppt", "pptx",
+            "woff", "woff2", "ttf", "otf", "eot",
+            "db", "sqlite", "sqlite3"
+          ],
+          "description": "File extensions to exclude from search results (without leading dot). Set to [] to disable."
         }
       }
     }
