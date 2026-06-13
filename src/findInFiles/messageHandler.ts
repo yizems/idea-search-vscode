@@ -131,6 +131,7 @@ export function createFindInFilesHandler(
                 const edit  = new vscode.WorkspaceEdit();
                 const scope = scopeManager.getScope(query.scopeId) ?? BUILTIN_SCOPES[0];
                 const cts2  = new vscode.CancellationTokenSource();
+                let editCount = 0;
                 await search(query, scope, result => {
                     const uri = vscode.Uri.parse(result.uriString);
                     for (const m of result.matches) {
@@ -139,11 +140,19 @@ export function createFindInFilesHandler(
                             edit.replace(uri,
                                 new vscode.Range(m.lineNumber, m.matchStart, m.lineNumber, m.matchEnd),
                                 replaceText);
+                            editCount++;
                         }
                     }
                 }, cts2.token);
-                await vscode.workspace.applyEdit(edit);
                 cts2.dispose();
+                console.log(`[idea-search] replaceAll: ${editCount} edits`);
+                const ok = await vscode.workspace.applyEdit(edit);
+                console.log(`[idea-search] applyEdit result: ${ok}`);
+                if (ok) {
+                    await vscode.workspace.saveAll(false);
+                } else {
+                    vscode.window.showErrorMessage('IDEA Search: Replace failed — some files may be read-only or have unsaved conflicts.');
+                }
                 send({ cmd: 'replaceAllDone', sessionId: msg.sessionId });
                 break;
             }
@@ -157,7 +166,9 @@ export function createFindInFilesHandler(
                 for (const p of replacePairs) {
                     edit.replace(uri, new vscode.Range(p.lineNumber, p.matchStart, p.lineNumber, p.matchEnd), replaceText);
                 }
-                await vscode.workspace.applyEdit(edit);
+                const ok = await vscode.workspace.applyEdit(edit);
+                console.log(`[idea-search] replaceFile ${uriStr}: ${ok}`);
+                if (ok) { await vscode.workspace.saveAll(false); }
                 send({ cmd: 'replaceFileDone', uriString: uriStr, sessionId: msg.sessionId });
                 break;
             }
@@ -168,7 +179,9 @@ export function createFindInFilesHandler(
                 const edit = new vscode.WorkspaceEdit();
                 edit.replace(uri, new vscode.Range(m.lineNumber, m.matchStart, m.lineNumber, m.matchEnd),
                     msg.replaceText as string);
-                await vscode.workspace.applyEdit(edit);
+                const ok = await vscode.workspace.applyEdit(edit);
+                console.log(`[idea-search] replaceItem line ${m.lineNumber}: ${ok}`);
+                if (ok) { await vscode.workspace.saveAll(false); }
                 send({ cmd: 'replaceItemDone', uriString: msg.uriString, match: m, sessionId: msg.sessionId });
                 break;
             }

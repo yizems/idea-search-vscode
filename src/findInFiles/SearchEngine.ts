@@ -282,7 +282,7 @@ async function searchWithRipgrep(
                 const colonIdx = rest.indexOf(':');
                 if (colonIdx === -1) { continue; }
                 const lineNum  = parseInt(rest.slice(0, colonIdx), 10) - 1; // 0-indexed
-                const lineText = rest.slice(colonIdx + 1);
+                const lineText = rest.slice(colonIdx + 1).replace(/\r$/, ''); // strip CRLF trailing \r
 
                 const uriString = vscode.Uri.file(filePart).toString();
 
