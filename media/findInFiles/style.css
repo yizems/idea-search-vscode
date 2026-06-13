@@ -36,10 +36,6 @@ body.mode-popup .dialog {
   top: auto !important;
   left: auto !important;
 }
-/* Hide resize handles in full-tab mode */
-body.mode-popup .resize-handle-s,
-body.mode-popup .resize-handle-e,
-body.mode-popup .resize-handle-se { display: none !important; }
 
 /* 鈹€鈹€ Panel layout 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€ */
 body.mode-panel { display: flex; flex-direction: column; height: 100vh; }
@@ -234,12 +230,28 @@ body.mode-popup .resize-handle-se { display: block; width: 16px; height: 16px; c
   min-height: 0;
 }
 
-/* Upper pane: results list */
+/* ── Results area — contains results pane + splitter + preview ─────
+   .layout-v = top/bottom (default)
+   .layout-h = left/right
+──────────────────────────────────────────────────────────────────── */
+.results-area {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  min-height: 0;
+  min-width: 0;
+  /* default: vertical split */
+  flex-direction: column;
+}
+.results-area.layout-h { flex-direction: row; }
+
+/* Results pane */
 .results-pane {
   flex: 1 1 auto;
   overflow-y: auto;
   overflow-x: hidden;
   min-height: 60px;
+  min-width: 120px;
   position: relative;
 }
 
@@ -252,36 +264,56 @@ body.mode-popup .resize-handle-se { display: block; width: 16px; height: 16px; c
 .empty-text  { font-size: 12px; text-align: center; }
 .results-list { }
 
-/* 鈹€鈹€ Pane splitter (horizontal drag) 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€ */
+/* ── Splitter ──────────────────────────────────────────────────────── */
 .pane-splitter {
   flex-shrink: 0;
-  height: 5px;
   background: var(--vscode-panel-border, #444);
-  cursor: ns-resize;
   user-select: none;
   position: relative;
-  transition: background 0.15s;
+  transition: background 0.12s;
+  z-index: 1;
 }
-.pane-splitter::after {
-  content: '';
-  position: absolute;
-  inset: -4px 0;   /* expand hit area */
+/* vertical layout: horizontal bar */
+.results-area.layout-v .pane-splitter {
+  height: 5px;
+  width: auto;
+  cursor: ns-resize;
+}
+.results-area.layout-v .pane-splitter::after {
+  content: ''; position: absolute; inset: -4px 0;
+}
+/* horizontal layout: vertical bar */
+.results-area.layout-h .pane-splitter {
+  width: 5px;
+  height: auto;
+  cursor: ew-resize;
+}
+.results-area.layout-h .pane-splitter::after {
+  content: ''; position: absolute; inset: 0 -4px;
 }
 .pane-splitter:hover,
-.pane-splitter.dragging {
-  background: var(--vscode-focusBorder, #0078d4);
-}
+.pane-splitter.dragging { background: var(--vscode-focusBorder, #0078d4); }
 
-/* 鈹€鈹€ F8 Preview pane 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€ */
+/* ── Preview pane ──────────────────────────────────────────────────── */
 .preview-pane {
   flex-shrink: 0;
-  height: 36%;
-  min-height: 80px;
-  max-height: 70%;
   display: flex;
   flex-direction: column;
-  border-top: none;  /* splitter acts as border */
   background: var(--vscode-editor-background);
+  /* vertical layout sizing */
+  height: 38%;
+  min-height: 80px;
+  max-height: 70%;
+  border-top: none;
+}
+.results-area.layout-h .preview-pane {
+  /* horizontal layout sizing */
+  height: auto;
+  width: 40%;
+  min-width: 200px;
+  max-width: 70%;
+  border-top: none;
+  border-left: none; /* splitter acts as divider */
 }
 .preview-header {
   display: flex; align-items: center; padding: 2px 8px;

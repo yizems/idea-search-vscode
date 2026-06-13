@@ -83,9 +83,9 @@ export function getWebviewContent(
       </div>
     </div>
 
-    <!-- ── Results + F8 Preview ── -->
+    <!-- ── Results + Preview split area ── -->
     <div class="results-area" id="resultsArea">
-      <!-- Upper pane: result list -->
+      <!-- Results pane -->
       <div class="results-pane" id="resultsPane">
         <div class="empty-state" id="emptyState">
           <span class="empty-icon">⌕</span>
@@ -94,10 +94,10 @@ export function getWebviewContent(
         <div class="results-list" id="resultsList"></div>
       </div>
 
-      <!-- Horizontal splitter (only visible when preview is open) -->
+      <!-- Splitter (hidden until preview open) -->
       <div class="pane-splitter hidden" id="paneSplitter"></div>
 
-      <!-- F8 Preview pane -->
+      <!-- Preview pane -->
       <div class="preview-pane hidden" id="previewPane">
         <div class="preview-header">
           <span class="preview-title" id="previewTitle">Preview</span>
@@ -111,10 +111,11 @@ export function getWebviewContent(
     <div class="status-bar">
       <span class="status-text" id="statusText"></span>
       <div class="status-actions">
-        <button class="icon-btn" id="btnPreview"     title="Toggle preview (F8)">👁</button>
-        <button class="icon-btn" id="btnExpandAll"   title="Expand all">⊞</button>
-        <button class="icon-btn" id="btnCollapseAll" title="Collapse all">⊟</button>
-        <button class="icon-btn" id="btnToggleView"  title="Toggle Tree / Flat view">🌲</button>
+        <button class="icon-btn" id="btnPreview"      title="Toggle preview">👁</button>
+        <button class="icon-btn" id="btnSplitDir"     title="Toggle split direction (horizontal ↔ vertical)">⇔</button>
+        <button class="icon-btn" id="btnExpandAll"    title="Expand all">⊞</button>
+        <button class="icon-btn" id="btnCollapseAll"  title="Collapse all">⊟</button>
+        <button class="icon-btn" id="btnToggleView"   title="Toggle Tree / Flat view">🌲</button>
       </div>
     </div>
 

@@ -16,6 +16,7 @@
     scopes:          saved.scopes          || [],
     history:         saved.history         || [],
     showPreview:     saved.showPreview !== undefined ? saved.showPreview : true,
+    splitDir:        saved.splitDir        || null,  // null = auto-detect on first load
   };
   let historyIdx  = -1;
   let historyTemp = '';
@@ -63,26 +64,58 @@
   const btnManageScopes=$('btnManageScopes');
   const resultsPane=    $('resultsPane');
   const paneSplitter=   $('paneSplitter');
+  const resultsArea=    $('resultsArea');
+  const btnSplitDir=    $('btnSplitDir');
 
-  // ── Drag: pane splitter (results ↕ preview) ───────────────────────
+  // ── Split layout helpers ──────────────────────────────────────────
+  // state.splitDir: 'v' (top/bottom) | 'h' (left/right)
+  // Decide initial layout by viewport aspect ratio
+  if (!state.splitDir) {
+    state.splitDir = window.innerWidth >= window.innerHeight * 1.4 ? 'h' : 'v';
+  }
+
+  function applySplitDir() {
+    if (!resultsArea) return;
+    resultsArea.classList.toggle('layout-h', state.splitDir === 'h');
+    resultsArea.classList.toggle('layout-v', state.splitDir !== 'h');
+    if (btnSplitDir) {
+      btnSplitDir.textContent = state.splitDir === 'h' ? '⇕' : '⇔';
+      btnSplitDir.title = state.splitDir === 'h' ? 'Switch to top/bottom split' : 'Switch to left/right split';
+    }
+    // Reset custom sizes when direction changes
+    if (resultsPane) { resultsPane.style.flex=''; resultsPane.style.height=''; resultsPane.style.width=''; }
+    if (previewPane)  { previewPane.style.height=''; previewPane.style.width=''; }
+  }
+  applySplitDir();
+
+  // ── Drag: pane splitter (direction-aware) ────────────────────────
   if (paneSplitter) {
     paneSplitter.addEventListener('mousedown', e => {
       e.preventDefault();
       paneSplitter.classList.add('dragging');
-      const resultsArea = paneSplitter.parentElement;
-      const startY      = e.clientY;
-      const startH      = resultsPane ? resultsPane.getBoundingClientRect().height : 200;
-      const totalH      = resultsArea ? resultsArea.getBoundingClientRect().height : 600;
+      const isH     = state.splitDir === 'h';
+      const startPos = isH ? e.clientX : e.clientY;
+      const startSize = resultsPane
+        ? (isH ? resultsPane.getBoundingClientRect().width : resultsPane.getBoundingClientRect().height)
+        : 200;
+      const totalSize = resultsArea
+        ? (isH ? resultsArea.getBoundingClientRect().width : resultsArea.getBoundingClientRect().height)
+        : 600;
+      const splitterSize = isH ? paneSplitter.offsetWidth : paneSplitter.offsetHeight;
 
       function onMove(ev) {
-        const delta = ev.clientY - startY;
-        const newH  = Math.max(60, Math.min(totalH - 80, startH + delta));
+        const delta   = (isH ? ev.clientX : ev.clientY) - startPos;
+        const minPane = isH ? 120 : 60;
+        const newSize = Math.max(minPane, Math.min(totalSize - minPane - splitterSize, startSize + delta));
         if (resultsPane) {
           resultsPane.style.flex = 'none';
-          resultsPane.style.height = newH + 'px';
+          if (isH) { resultsPane.style.width = newSize + 'px'; resultsPane.style.height = ''; }
+          else     { resultsPane.style.height = newSize + 'px'; resultsPane.style.width = ''; }
         }
         if (previewPane) {
-          previewPane.style.height = (totalH - newH - paneSplitter.offsetHeight) + 'px';
+          const previewSize = totalSize - newSize - splitterSize;
+          if (isH) { previewPane.style.width = previewSize + 'px'; previewPane.style.height = ''; }
+          else     { previewPane.style.height = previewSize + 'px'; previewPane.style.width = ''; }
         }
       }
       function onUp() {
@@ -93,52 +126,6 @@
       document.addEventListener('mousemove', onMove);
       document.addEventListener('mouseup',   onUp);
     });
-  }
-
-  // ── Drag: popup dialog resize (bottom / right / corner) ──────────
-  if (MODE === 'popup') {
-    const dialog  = $('dialog');
-    const resizeS  = $('resizeS');
-    const resizeE  = $('resizeE');
-    const resizeSE = $('resizeSE');
-
-    function makeResizer(handle, resizeW, resizeH) {
-      if (!handle || !dialog) return;
-      handle.addEventListener('mousedown', e => {
-        e.preventDefault();
-        const startX = e.clientX;
-        const startY = e.clientY;
-        const rect   = dialog.getBoundingClientRect();
-        const startW = rect.width;
-        const startH = rect.height;
-
-        function onMove(ev) {
-          if (resizeW) {
-            // dialog is centered via left:50% + translateX(-50%),
-            // grow/shrink symmetrically (delta applied to each side)
-            const delta = ev.clientX - startX;
-            const newW  = Math.max(520, Math.min(window.innerWidth - 40, startW + delta * 2));
-            dialog.style.width    = newW + 'px';
-            dialog.style.maxWidth = 'none';
-          }
-          if (resizeH) {
-            const newH = Math.max(300, Math.min(window.innerHeight - 30, startH + (ev.clientY - startY)));
-            dialog.style.height    = newH + 'px';
-            dialog.style.maxHeight = 'none';
-          }
-        }
-        function onUp() {
-          document.removeEventListener('mousemove', onMove);
-          document.removeEventListener('mouseup',   onUp);
-        }
-        document.addEventListener('mousemove', onMove);
-        document.addEventListener('mouseup',   onUp);
-      });
-    }
-
-    makeResizer(resizeS,  false, true);
-    makeResizer(resizeE,  true,  false);
-    makeResizer(resizeSE, true,  true);
   }
 
   // ── F3 Tab bar ───────────────────────────────────────────────────────
@@ -396,9 +383,7 @@
     item.addEventListener('click',e=>{
       if (e.target===eb||(e.target instanceof HTMLButtonElement)) return;
       openFile(file.uriString,match.lineNumber,e.ctrlKey||e.metaKey);
-      if (state.showPreview) vscode.postMessage({cmd:'previewFile',uriString:file.uriString,lineNumber:match.lineNumber});
-    });
-    item.addEventListener('mouseenter',()=>{
+      // Preview on click only
       if (state.showPreview) {
         vscode.postMessage({cmd:'previewFile',uriString:file.uriString,lineNumber:match.lineNumber});
         if (previewTitle) previewTitle.textContent=file.relativePath+':'+(match.lineNumber+1);
@@ -509,13 +494,20 @@
   if (btnHistory) btnHistory.addEventListener('click',e=>{ e.stopPropagation(); historyDropdown.classList.contains('hidden')?openHistoryDropdown():historyDropdown.classList.add('hidden'); });
   if (btnPreview) { btnPreview.addEventListener('click',()=>{ state.showPreview=!state.showPreview; btnPreview.classList.toggle('active',state.showPreview); setPreviewVisible(state.showPreview); saveState(); }); btnPreview.classList.toggle('active',state.showPreview); }
   if (btnClosePreview) btnClosePreview.addEventListener('click',()=>{ state.showPreview=false; if(btnPreview) btnPreview.classList.remove('active'); setPreviewVisible(false); saveState(); });
+  if (btnSplitDir) btnSplitDir.addEventListener('click',()=>{
+    state.splitDir = state.splitDir === 'h' ? 'v' : 'h';
+    applySplitDir();
+    saveState();
+  });
   document.addEventListener('click',e=>{ if(historyDropdown&&!historyDropdown.contains(e.target)&&e.target!==btnHistory) historyDropdown.classList.add('hidden'); });
 
   // ── Preview visibility helper ─────────────────────────────────────
   function setPreviewVisible(visible) {
     if (previewPane)   { previewPane.classList.toggle('hidden',  !visible); }
     if (paneSplitter)  { paneSplitter.classList.toggle('hidden', !visible); }
-    if (!visible && resultsPane) { resultsPane.style.flex=''; resultsPane.style.height=''; }
+    if (!visible && resultsPane) {
+      resultsPane.style.flex=''; resultsPane.style.height=''; resultsPane.style.width='';
+    }
   }
   // Apply initial state
   setPreviewVisible(state.showPreview);
@@ -528,7 +520,7 @@
   function saveState() {
     vscode.setState({ sessions:state.sessions.map(s=>({...s,results:s.isPinned?s.results:s.results.slice(0,300)})),
       activeSessionId:state.activeSessionId, viewMode:state.viewMode, scopes:state.scopes,
-      history:state.history, showPreview:state.showPreview });
+      history:state.history, showPreview:state.showPreview, splitDir:state.splitDir });
   }
 
   // ── Message bus ──────────────────────────────────────────────────────
