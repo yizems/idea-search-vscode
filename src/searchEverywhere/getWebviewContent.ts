@@ -21,8 +21,7 @@ export function getSearchEverywhereHtml(
   <link rel="stylesheet" href="${styleUri}">
   <title>Search Everywhere</title>
 </head>
-<body>
-  <div class="backdrop" id="backdrop"></div>
+<body style="margin:0;padding:0">
   <div class="dialog">
 
     <!-- Search input -->
@@ -30,7 +29,7 @@ export function getSearchEverywhereHtml(
       <span class="search-icon">⌕</span>
       <input type="text" id="seInput" class="se-input" placeholder="Search everywhere…"
              autocomplete="off" spellcheck="false">
-      <span class="shortcut-hint">Esc to close</span>
+      <span class="shortcut-hint">↑↓ navigate · Enter open · Tab switch</span>
     </div>
 
     <!-- Tabs: All / Files / Symbols / Text / Actions -->
@@ -42,7 +41,7 @@ export function getSearchEverywhereHtml(
       <button class="se-tab" data-tab="actions">Actions</button>
     </div>
 
-    <!-- Body: list + preview -->
+    <!-- Body: results + splitter + preview -->
     <div class="se-body">
       <div class="se-results-wrap">
         <div class="se-results" id="seResults">
@@ -52,6 +51,7 @@ export function getSearchEverywhereHtml(
           </div>
         </div>
       </div>
+      <div class="se-splitter" id="seSplitter"></div>
       <div class="se-preview" id="sePreview">
         <div class="se-preview-empty">Select a result to preview</div>
       </div>

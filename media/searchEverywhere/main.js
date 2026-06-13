@@ -17,7 +17,36 @@
   const seEmpty   = document.getElementById('seEmpty');
   const seStatus  = document.getElementById('seStatus');
   const sePreview = document.getElementById('sePreview');
-  const backdrop  = document.getElementById('backdrop');
+  const seSplitter = document.getElementById('seSplitter');
+
+  // ── Splitter drag ──────────────────────────────────────────────────
+  if (seSplitter) {
+    seSplitter.addEventListener('mousedown', e => {
+      e.preventDefault();
+      seSplitter.classList.add('dragging');
+      const seBody   = seSplitter.parentElement;
+      const startX   = e.clientX;
+      const startW   = sePreview ? sePreview.getBoundingClientRect().width : 400;
+      const totalW   = seBody   ? seBody.getBoundingClientRect().width    : 1000;
+
+      function onMove(ev) {
+        const delta  = startX - ev.clientX;   // dragging left = preview grows
+        const newW   = Math.max(200, Math.min(totalW * 0.7, startW + delta));
+        if (sePreview) {
+          sePreview.style.width    = newW + 'px';
+          sePreview.style.minWidth = 'unset';
+          sePreview.style.maxWidth = 'none';
+        }
+      }
+      function onUp() {
+        seSplitter.classList.remove('dragging');
+        document.removeEventListener('mousemove', onMove);
+        document.removeEventListener('mouseup',   onUp);
+      }
+      document.addEventListener('mousemove', onMove);
+      document.addEventListener('mouseup',   onUp);
+    });
+  }
 
   // ── Icons per type / symbol kind ─────────────────────────────────
   const TYPE_ICON = { file: '📄', symbol: '🔷', text: '⌕', action: '⚡' };
@@ -62,10 +91,6 @@
     if (e.key === 'ArrowUp')   { e.preventDefault(); moveSelection(-1); return; }
     if (e.key === 'Enter')     { e.preventDefault(); activateSelected(); return; }
   });
-
-  if (backdrop) {
-    backdrop.addEventListener('click', () => vscode.postMessage({ cmd: 'close' }));
-  }
 
   // ── Search ────────────────────────────────────────────────────────
   function doSearch() {
@@ -126,11 +151,12 @@
     body.append(lbl, det);
     el.append(icon, body);
 
-    el.addEventListener('click', () => activateItem(item));
-    el.addEventListener('mouseenter', () => {
+    el.addEventListener('click', () => {
       setSelected(filteredItems.indexOf(item));
+      // single click: update preview only
       previewItem(item);
     });
+    el.addEventListener('dblclick', () => activateItem(item));
 
     seResults.appendChild(el);
     seEmpty.style.display = 'none';
@@ -203,6 +229,13 @@
       txt.textContent = raw.length > 300 ? raw.slice(0, 300) + '…' : raw;
 
       row.append(num, txt);
+      // double-click preview line → open that line in editor
+      row.addEventListener('dblclick', () => {
+        const item = filteredItems[selectedIdx];
+        if (item && item.uriString) {
+          vscode.postMessage({ cmd: 'openFile', uriString: item.uriString, lineNumber: al });
+        }
+      });
       code.appendChild(row);
     }
     sePreview.appendChild(code);
