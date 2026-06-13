@@ -2,10 +2,14 @@
   "name": "idea-search",
   "displayName": "IDEA Search",
   "description": "IntelliJ IDEA-like search experience for VS Code — floating popup, multi-tab sessions, custom scopes",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "publisher": "local",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yizems/idea-search-vscode.git"
+  },
   "engines": {
-    "vscode": "^1.74.0"
+    "vscode": "^1.120.0"
   },
   "categories": [
     "Other"
