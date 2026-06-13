@@ -2,7 +2,7 @@
   "name": "idea-search",
   "displayName": "IDEA Search",
   "description": "IntelliJ IDEA-like search experience for VS Code — floating popup, multi-tab sessions, custom scopes",
-  "version": "0.1.0",
+  "version": "0.0.1",
   "publisher": "local",
   "engines": {
     "vscode": "^1.74.0"
