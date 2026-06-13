@@ -10,7 +10,11 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+    "onCommand:idea-search.findInFiles",
+    "onCommand:idea-search.searchEverywhere",
+    "onCommand:idea-search.manageScopes"
+  ],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
@@ -35,11 +39,13 @@
         "command": "idea-search.findInFiles",
         "key": "ctrl+alt+f",
         "mac": "cmd+alt+f"
+        "when": "editorTextFocus || editorFocus || terminalFocus || sideBarFocus || panelFocus"
       },
       {
         "command": "idea-search.searchEverywhere",
         "key": "ctrl+alt+shift+f",
         "mac": "cmd+alt+shift+f"
+        "when": "editorTextFocus || editorFocus || terminalFocus || sideBarFocus || panelFocus"
       }
     ],
     "configuration": {
