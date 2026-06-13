@@ -4,7 +4,7 @@ import * as path from 'path';
 import { execFile } from 'child_process';
 import { SearchQuery, SearchMatch, SearchResultFile, SearchSummary, Scope } from '../shared/types';
 
-// 鈹€鈹€ Regex builder (used for non-project scopes) 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+// -- Regex builder (used for non-project scopes) ----------------------------
 
 function buildPattern(query: SearchQuery): RegExp | null {
     if (!query.text) { return null; }
@@ -23,7 +23,7 @@ function buildPattern(query: SearchQuery): RegExp | null {
     }
 }
 
-// 鈹€鈹€ File mask parser 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+// -- File mask parser -------------------------------------------------------
 
 export function parseFileMask(mask: string): { include: string[]; exclude: string[] } {
     if (!mask.trim()) {
@@ -45,7 +45,7 @@ export function parseFileMask(mask: string): { include: string[]; exclude: strin
     return { include: include.length ? include : ['**/*'], exclude };
 }
 
-// 鈹€鈹€ Shared exclude config 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+// -- Shared exclude config --------------------------------------------------
 
 const DEFAULT_EXCLUDE = [
     '**/node_modules/**',
@@ -76,7 +76,7 @@ function buildExcludeGlob(scope: Scope, mask: string): string {
     return `{${all.join(',')}}`;
 }
 
-// 鈹€鈹€ Special-scope file lists (open-files / git-changed / current-file) 鈹€鈹€鈹€鈹€鈹€
+// -- Special-scope file lists (open-files / git-changed / current-file) -----
 
 async function getSpecialScopeFiles(
     scope: Scope,
@@ -150,7 +150,7 @@ function getGitChangedFiles(token: vscode.CancellationToken): Promise<vscode.Uri
     });
 }
 
-// 鈹€鈹€ Per-file search (used for special scopes) 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+// -- Per-file search (used for special scopes) ------------------------------
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
 
@@ -324,7 +324,7 @@ async function searchWithRipgrep(
     });
 }
 
-// 鈹€鈹€ Public search API 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+// -- Public search API ------------------------------------------------------
 
 export async function search(
     query: SearchQuery,
@@ -337,7 +337,7 @@ export async function search(
         return { totalMatches: 0, totalFiles: 0, elapsedMs: 0 };
     }
 
-    // 鈹€鈹€ Project scope: delegate to ripgrep 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+    // -- Project scope: delegate to ripgrep --------------------------------
     if (scope.id === 'project') {
         const { totalMatches, totalFiles } = await searchWithRipgrep(query, scope, onResult, token);
         return {
@@ -348,7 +348,7 @@ export async function search(
         };
     }
 
-    // 鈹€鈹€ Special scopes: build file list then search with Node RegExp 鈹€鈹€鈹€鈹€鈹€鈹€
+    // -- Special scopes: build file list then search with Node RegExp ------
     const pattern = buildPattern(query);
     if (!pattern) {
         return { totalMatches: 0, totalFiles: 0, elapsedMs: 0 };

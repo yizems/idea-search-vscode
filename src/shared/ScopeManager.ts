@@ -1,4 +1,4 @@
-import * as vscode from 'vscode';
+﻿import * as vscode from 'vscode';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { Scope, BUILTIN_SCOPES } from './types';

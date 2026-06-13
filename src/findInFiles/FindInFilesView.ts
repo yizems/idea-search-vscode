@@ -1,4 +1,4 @@
-import * as vscode from 'vscode';
+﻿import * as vscode from 'vscode';
 import { ScopeManager } from '../shared/ScopeManager';
 import { getWebviewContent } from './getWebviewContent';
 import { createFindInFilesHandler } from './messageHandler';

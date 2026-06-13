@@ -1,4 +1,4 @@
-import * as vscode from 'vscode';
+﻿import * as vscode from 'vscode';
 import { SearchQuery, SearchResultFile, BUILTIN_SCOPES } from '../shared/types';
 import { search } from './SearchEngine';
 import { ScopeManager } from '../shared/ScopeManager';

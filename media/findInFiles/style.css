@@ -12,7 +12,7 @@ body {
   width: 100vw;
 }
 
-/* 鈹€鈹€ Popup layout 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€ */
+/* -- Popup layout ---------------------------------------------------- */
 body.mode-popup {
   display: flex;
   flex-direction: column;
@@ -38,7 +38,7 @@ body.mode-popup .dialog {
   left: auto !important;
 }
 
-/* 鈹€鈹€ Panel layout 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€ */
+/* -- Panel layout ---------------------------------------------------- */
 body.mode-panel { display: flex; flex-direction: column; height: 100vh; }
 body.mode-panel .backdrop { display: none; }
 body.mode-panel .dialog   { flex: 1; overflow: hidden; }
@@ -53,7 +53,7 @@ body.mode-panel .dialog   { flex: 1; overflow: hidden; }
   position: relative;
 }
 
-/* 鈹€鈹€ F3 Tab bar 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€ */
+/* -- F3 Tab bar ------------------------------------------------------ */
 .tab-bar {
   display: flex;
   align-items: center;
@@ -111,7 +111,7 @@ body.mode-panel .dialog   { flex: 1; overflow: hidden; }
 }
 .new-tab-btn:hover { color: var(--vscode-foreground); }
 
-/* 鈹€鈹€ Toolbar 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€ */
+/* -- Toolbar --------------------------------------------------------- */
 .toolbar {
   flex-shrink: 0;
   padding: 6px 8px 5px;
@@ -210,7 +210,7 @@ body.mode-panel .dialog   { flex: 1; overflow: hidden; }
 .opt-select:focus { border-color: var(--vscode-focusBorder); }
 .hidden { display: none !important; }
 
-/* 鈹€鈹€ Results area (flex column, holds results-pane + splitter + preview) 鈹€鈹€ */
+/* -- Results area (flex column, holds results-pane + splitter + preview) -- */
 .results-area {
   flex: 1;
   overflow: hidden;
@@ -328,7 +328,7 @@ body.mode-panel .dialog   { flex: 1; overflow: hidden; }
 }
 .preview-match-line .preview-line-num { color: var(--vscode-foreground); font-weight: 700; }
 
-/* 鈹€鈹€ File group 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€ */
+/* -- File group ------------------------------------------------------ */
 .file-group { margin-bottom: 1px; }
 .file-header {
   display: flex; align-items: center; gap: 4px; padding: 3px 8px; cursor: pointer;
@@ -349,7 +349,7 @@ body.mode-panel .dialog   { flex: 1; overflow: hidden; }
 }
 .file-group.collapsed .match-list { display: none; }
 
-/* 鈹€鈹€ Match items 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€ */
+/* -- Match items ----------------------------------------------------- */
 .match-list { background: var(--vscode-editor-background); }
 .match-item {
   display: flex; align-items: baseline; padding: 2px 8px 2px 24px; gap: 6px;
@@ -381,7 +381,7 @@ body.mode-panel .dialog   { flex: 1; overflow: hidden; }
 .match-btn:hover { opacity: 1 !important; background: var(--vscode-list-hoverBackground); }
 .exclude-btn.active { color: var(--vscode-errorForeground, #f66); opacity: 1; }
 
-/* 鈹€鈹€ Dir group (tree view) 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€ */
+/* -- Dir group (tree view) ------------------------------------------- */
 .dir-group { margin-bottom: 1px; }
 .dir-header {
   display: flex; align-items: center; gap: 4px; padding: 3px 8px; cursor: pointer;
@@ -392,7 +392,7 @@ body.mode-panel .dialog   { flex: 1; overflow: hidden; }
 .dir-name  { flex: 1; }
 .dir-group.collapsed > :not(.dir-header) { display: none; }
 
-/* 鈹€鈹€ Status bar 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€ */
+/* -- Status bar ------------------------------------------------------ */
 .status-bar {
   flex-shrink: 0; display: flex; align-items: center; justify-content: space-between;
   padding: 3px 8px; border-top: 1px solid var(--vscode-panel-border, #444);
@@ -408,7 +408,7 @@ body.mode-panel .dialog   { flex: 1; overflow: hidden; }
 .icon-btn:hover  { background: var(--vscode-list-hoverBackground); color: var(--vscode-foreground); }
 .icon-btn.active { color: var(--vscode-focusBorder, #0078d4); }
 
-/* Scrollbars 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€ */
+/* Scrollbars ------------------------------------------------------ */
 .results-pane::-webkit-scrollbar,
 .history-dropdown::-webkit-scrollbar,
 .preview-content::-webkit-scrollbar { width: 5px; }
@@ -430,7 +430,7 @@ body {
   width: 100vw;
 }
 
-/* 鈹€鈹€ Popup layout 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€ */
+/* -- Popup layout ---------------------------------------------------- */
 body.mode-popup {
   display: flex;
   align-items: flex-start;
@@ -455,6 +455,6 @@ body.mode-popup .dialog {
   box-shadow: 0 12px 40px rgba(0,0,0,.55);
 }
 
-/* 鈹€鈹€ Panel layout 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€ */
+/* -- Panel layout ---------------------------------------------------- */
 body.mode-panel { display: flex; flex-direction: column; height: 100vh; }
 body.mode-panel .backdrop { display: none; }

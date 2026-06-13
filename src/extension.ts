@@ -1,4 +1,4 @@
-import * as vscode from 'vscode';
+﻿import * as vscode from 'vscode';
 import { FindInFilesView } from './findInFiles/FindInFilesView';
 import { SearchEverywhereView } from './searchEverywhere/SearchEverywhereView';
 import { ScopeManager } from './shared/ScopeManager';

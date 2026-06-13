@@ -1,4 +1,4 @@
-export interface SearchQuery {
+﻿export interface SearchQuery {
     text: string;
     isRegex: boolean;
     isCaseSensitive: boolean;
