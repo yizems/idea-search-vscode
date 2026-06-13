@@ -183,40 +183,16 @@ function chunkArray<T>(arr: T[], size: number): T[][] {
     return out;
 }
 
-// ── ripgrep-backed search (project scope) ─────────────────────────────────
+// -- ripgrep-backed search (project scope) ---------------------------------
 
-/** Locate the rg binary bundled with VS Code. */
+/** Return the path to the rg binary from the bundled @vscode/ripgrep package. */
 function findRgBinary(): string {
-    // VS Code ships rg inside its own app directory
-    const vscodeExe = process.execPath; // path to the Electron executable
-    const base = path.dirname(vscodeExe);
-
-    // Typical paths on each OS
-    const candidates: string[] = [];
-    if (process.platform === 'win32') {
-        candidates.push(
-            path.join(base, 'resources', 'app', 'node_modules', '@vscode', 'ripgrep', 'bin', 'rg.exe'),
-            path.join(base, 'resources', 'app', 'node_modules.asar.unpacked', '@vscode', 'ripgrep', 'bin', 'rg.exe'),
-        );
-    } else if (process.platform === 'darwin') {
-        // execPath is …/Electron; VS Code is …/Contents/MacOS/Electron
-        const appDir = path.join(base, '..', 'Resources', 'app');
-        candidates.push(
-            path.join(appDir, 'node_modules', '@vscode', 'ripgrep', 'bin', 'rg'),
-            path.join(appDir, 'node_modules.asar.unpacked', '@vscode', 'ripgrep', 'bin', 'rg'),
-        );
-    } else {
-        candidates.push(
-            path.join(base, 'resources', 'app', 'node_modules', '@vscode', 'ripgrep', 'bin', 'rg'),
-            path.join(base, 'resources', 'app', 'node_modules.asar.unpacked', '@vscode', 'ripgrep', 'bin', 'rg'),
-        );
+    try {
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        return (require('@vscode/ripgrep') as { rgPath: string }).rgPath;
+    } catch {
+        return 'rg'; // fallback: hope it's on PATH
     }
-
-    const { existsSync } = require('fs') as typeof import('fs');
-    for (const c of candidates) {
-        if (existsSync(c)) { return c; }
-    }
-    return 'rg'; // fallback: hope it's on PATH
 }
 
 async function searchWithRipgrep(
@@ -255,6 +231,8 @@ async function searchWithRipgrep(
     args.push(workspacePath);
 
     const rgPath = findRgBinary();
+    console.log('[idea-search] rg binary:', rgPath);
+    console.log('[idea-search] rg args:', args.join(' '));
 
     return new Promise(resolve => {
         let totalMatches = 0;
@@ -268,6 +246,7 @@ async function searchWithRipgrep(
         let currentUri: string | null = null;
         let currentResult: SearchResultFile | null = null;
         let buf = '';
+        let stderrBuf = '';
 
         function flush() {
             if (currentResult && currentResult.matches.length > 0) {
@@ -285,6 +264,8 @@ async function searchWithRipgrep(
         token.onCancellationRequested(() => proc.kill());
 
         proc.stdout?.setEncoding('utf8');
+        proc.stderr?.setEncoding('utf8');
+        proc.stderr?.on('data', (d: string) => { stderrBuf += d; });
         proc.stdout?.on('data', (chunk: string) => {
             if (token.isCancellationRequested) { return; }
             buf += chunk;
@@ -331,7 +312,9 @@ async function searchWithRipgrep(
             }
         });
 
-        proc.on('close', () => {
+        proc.on('close', (code: number) => {
+            if (stderrBuf) { console.warn('[idea-search] rg stderr:', stderrBuf.slice(0, 500)); }
+            console.log(`[idea-search] rg exit code: ${code}, files: ${totalFiles}, matches: ${totalMatches}`);
             flush(); // emit the last buffered file
             resolve({ totalMatches, totalFiles });
         });
