@@ -194,8 +194,12 @@ body {
 .se-preview-line:hover { background: var(--vscode-list-hoverBackground); }
 .se-preview-linenum  { color: var(--vscode-editorLineNumber-foreground, #888); min-width: 28px; text-align: right; flex-shrink: 0; user-select: none; }
 .se-preview-linetext { flex: 1; overflow: hidden; text-overflow: ellipsis; }
-.se-preview-line.match-line { background: var(--vscode-editor-lineHighlightBackground, rgba(255,255,255,.05)); }
-.se-preview-line.match-line .se-preview-linenum { color: var(--vscode-foreground); }
+.se-preview-line.match-line {
+  background: var(--vscode-editor-findMatchHighlightBackground, rgba(255, 200, 0, 0.25));
+  border-left: 3px solid var(--vscode-editorInfo-foreground, #0078d4);
+  padding-left: 5px;
+}
+.se-preview-line.match-line .se-preview-linenum { color: var(--vscode-foreground); font-weight: 700; }
 
 /* Footer */
 .se-footer {

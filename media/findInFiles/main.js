@@ -334,9 +334,11 @@
     if (state.viewMode==='flat') renderFileGroup(file,resultsList,sess); else rerenderResults(sess);
     setStatus(`${sess.totalMatches} match${sess.totalMatches!==1?'es':''} in ${sess.totalFiles} file${sess.totalFiles!==1?'s':''}…`);
   }
-  function renderFileGroup(file,container,sess) {
+  function renderFileGroup(file,container,sess,indent) {
+    indent = indent || 0;
     const group=document.createElement('div'); group.className='file-group'; group.dataset.uri=file.uriString;
     const header=document.createElement('div'); header.className='file-header';
+    header.style.paddingLeft = (8 + indent) + 'px';
     const arrow=document.createElement('span'); arrow.className='collapse-icon'; arrow.textContent='▼';
     const icon=document.createElement('span'); icon.className='file-icon'; icon.textContent='📄';
     const pe=document.createElement('span'); pe.className='file-path'; pe.textContent=pe.title=file.relativePath;
@@ -350,6 +352,7 @@
     }
     header.addEventListener('click',()=>{ group.classList.toggle('collapsed'); arrow.textContent=group.classList.contains('collapsed')?'▶':'▼'; });
     const ml=document.createElement('div'); ml.className='match-list';
+    ml.style.paddingLeft = indent + 'px';
     for (const m of file.matches) ml.appendChild(makeMatchItem(file,m,sess));
     group.append(header,ml); container.appendChild(group);
   }
@@ -421,18 +424,20 @@
       if (!node.__files) node.__files=[];
       node.__files.push(f);
     }
-    renderTreeNode(root,resultsList,sess);
+    renderTreeNode(root,resultsList,sess,0);
   }
-  function renderTreeNode(node,container,sess) {
-    if (node.__files) for (const f of node.__files) renderFileGroup(f,container,sess);
+  function renderTreeNode(node,container,sess,depth) {
+    const indent = depth * 16;
+    if (node.__files) for (const f of node.__files) renderFileGroup(f,container,sess,indent);
     for (const [name,child] of Object.entries(node)) {
       if (name==='__files') continue;
       const cnt=countTreeMatches(child);
       const dg=document.createElement('div'); dg.className='dir-group';
       const dh=document.createElement('div'); dh.className='dir-header';
+      dh.style.paddingLeft = (8 + indent) + 'px';
       dh.innerHTML=`<span class="dir-arrow">▼</span><span class="file-icon">📁</span><span class="dir-name">${escHtml(name)}</span><span class="badge">${cnt}</span>`;
       dh.addEventListener('click',()=>{ dg.classList.toggle('collapsed'); dh.querySelector('.dir-arrow').textContent=dg.classList.contains('collapsed')?'▶':'▼'; });
-      dg.appendChild(dh); renderTreeNode(child,dg,sess); container.appendChild(dg);
+      dg.appendChild(dh); renderTreeNode(child,dg,sess,depth+1); container.appendChild(dg);
     }
   }
   function countTreeMatches(node) {
